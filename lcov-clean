@@ -1,0 +1,2 @@
+rm build/CMakeFiles/TestModule.dir/src/TestModule/*.gcda
+rm build/CMakeFiles/common.dir/src/common/*.gcda

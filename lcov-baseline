@@ -1,0 +1,1 @@
+lcov --no-external --capture --initial --directory ./build/CMakeFiles/TestModule.dir/src/TestModule/ --output-file ./tmp/baseline.info

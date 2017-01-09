@@ -1,0 +1,2 @@
+lcov --no-external --capture --directory ./build/CMakeFiles/TestModule.dir/src/TestModule/ --output-file ./tmp/trace.info
+lcov --add-tracefile ./tmp/baseline.info --add-tracefile ./tmp/trace.info --output-file ./tmp/coverage.info

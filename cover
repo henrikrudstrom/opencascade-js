@@ -1,0 +1,1 @@
+gcovr -r ./src/ --object-directory=./build/CMakeFiles/TestModule.dir/src/ --branches -o result.gcov
