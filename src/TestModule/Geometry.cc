@@ -9,8 +9,14 @@ TestModule::Geometry::Geometry(opencascade::handle<Geom_Geometry> wrapObj) : wra
 
 v8::Local<v8::Object> TestModule::Geometry::BuildWrapper(void *res) {
     auto obj = new Geometry(*static_cast<opencascade::handle<Geom_Geometry> *>(res));
-    v8::Local<v8::Object> val =
-        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext()).ToLocalChecked();
+    v8::TryCatch onError;
+    v8::MaybeLocal<v8::Object> maybeVal =
+        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext());
+    if (onError.HasCaught()) {
+        v8::Local<v8::Object> empty;
+        return empty;
+    }
+    v8::Local<v8::Object> val = maybeVal.ToLocalChecked();
     obj->Wrap(val);
     return val;
 }

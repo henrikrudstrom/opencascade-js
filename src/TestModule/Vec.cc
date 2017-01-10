@@ -9,8 +9,14 @@ TestModule::Vec::Vec(gp_Vec wrapObj) : wrappedObject(wrapObj) {}
 
 v8::Local<v8::Object> TestModule::Vec::BuildWrapper(void* res) {
     auto obj = new Vec(*static_cast<gp_Vec*>(res));
-    v8::Local<v8::Object> val =
-        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext()).ToLocalChecked();
+    v8::TryCatch onError;
+    v8::MaybeLocal<v8::Object> maybeVal =
+        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext());
+    if (onError.HasCaught()) {
+        v8::Local<v8::Object> empty;
+        return empty;
+    }
+    v8::Local<v8::Object> val = maybeVal.ToLocalChecked();
     obj->Wrap(val);
     return val;
 }
@@ -44,16 +50,16 @@ bool TestModule::Vec::VecOverload3(const Nan::FunctionCallbackInfo<v8::Value>& i
         return false;
     }
 
-    Standard_Real argXv;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argXv)) {
+    Standard_Integer argXv;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argXv)) {
         return false;
     }
-    Standard_Real argYv;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argYv)) {
+    Standard_Integer argYv;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argYv)) {
         return false;
     }
-    Standard_Real argZv;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[2], argZv)) {
+    Standard_Integer argZv;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[2], argZv)) {
         return false;
     }
 
@@ -155,8 +161,8 @@ NAN_GETTER(TestModule::Vec::Z) {
 }
 bool TestModule::Vec::SetXOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argX;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argX)) {
+    Standard_Integer argX;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argX)) {
         return false;
     }
 
@@ -175,8 +181,8 @@ NAN_SETTER(TestModule::Vec::SetX) {
 }
 bool TestModule::Vec::SetYOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argY;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argY)) {
+    Standard_Integer argY;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argY)) {
         return false;
     }
 
@@ -195,8 +201,8 @@ NAN_SETTER(TestModule::Vec::SetY) {
 }
 bool TestModule::Vec::SetZOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argZ;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argZ)) {
+    Standard_Integer argZ;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argZ)) {
         return false;
     }
 

@@ -9,8 +9,14 @@ TestModule::Ax1::Ax1(gp_Ax1 wrapObj) : wrappedObject(wrapObj) {}
 
 v8::Local<v8::Object> TestModule::Ax1::BuildWrapper(void* res) {
     auto obj = new Ax1(*static_cast<gp_Ax1*>(res));
-    v8::Local<v8::Object> val =
-        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext()).ToLocalChecked();
+    v8::TryCatch onError;
+    v8::MaybeLocal<v8::Object> maybeVal =
+        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext());
+    if (onError.HasCaught()) {
+        v8::Local<v8::Object> empty;
+        return empty;
+    }
+    v8::Local<v8::Object> val = maybeVal.ToLocalChecked();
     obj->Wrap(val);
     return val;
 }

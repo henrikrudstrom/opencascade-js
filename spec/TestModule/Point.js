@@ -1,8 +1,14 @@
-const TestModule = require('../../lib/TestModule/Point.js');
+var lib = require('../lib');
+const TestModule = require('../../lib/TestModule.js');
 
 describe('Point', () => {
-  it('distance(Point)', () => {
-    // test 
+  var subject;
+  beforeEach(() => {
+    subject = 'abstract'
   });
 
+  it('distance(Point', () => {
+    var result = subject.distance('abstract');
+    expect(result).to.be.typeOrConstructorOf('Number');
+  });
 });

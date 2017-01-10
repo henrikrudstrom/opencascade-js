@@ -9,8 +9,14 @@ TestModule::Curve::Curve(opencascade::handle<Geom_Curve> wrapObj) : Geometry(wra
 
 v8::Local<v8::Object> TestModule::Curve::BuildWrapper(void *res) {
     auto obj = new Curve(*static_cast<opencascade::handle<Geom_Curve> *>(res));
-    v8::Local<v8::Object> val =
-        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext()).ToLocalChecked();
+    v8::TryCatch onError;
+    v8::MaybeLocal<v8::Object> maybeVal =
+        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext());
+    if (onError.HasCaught()) {
+        v8::Local<v8::Object> empty;
+        return empty;
+    }
+    v8::Local<v8::Object> val = maybeVal.ToLocalChecked();
     obj->Wrap(val);
     return val;
 }
@@ -23,8 +29,8 @@ bool TestModule::Curve::D0Overload0(const Nan::FunctionCallbackInfo<v8::Value> &
         return false;
     }
 
-    Standard_Real argU;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argU)) {
+    Standard_Integer argU;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argU)) {
         return false;
     }
     gp_Pnt argP;
@@ -47,8 +53,8 @@ bool TestModule::Curve::D1Overload0(const Nan::FunctionCallbackInfo<v8::Value> &
         return false;
     }
 
-    Standard_Real argU;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argU)) {
+    Standard_Integer argU;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argU)) {
         return false;
     }
     gp_Pnt argP;

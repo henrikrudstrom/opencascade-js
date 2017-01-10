@@ -1,40 +1,54 @@
-const TestModule = require('../../lib/TestModule/Dir.js');
+var lib = require('../lib');
+const TestModule = require('../../lib/TestModule.js');
 
 describe('Dir', () => {
-  it('Dir()', () => {
-    // test 
+  var subject;
+  beforeEach(() => {
+    subject = new TestModule.Dir(18, 19, 20)
   });
 
-  it('Dir(Vec)', () => {
-    // test 
+  it('Dir(Number, Number, Number', () => {
+    var result = new TestModule.Dir(21, 22, 23);
+    expect(result).to.be.typeOrConstructorOf('Dir');
   });
 
-  it('Dir(double, double, double)', () => {
-    // test 
+  it('Dir(Vec', () => {
+    var result = new TestModule.Dir(new TestModule.Vec(24, 25, 26));
+    expect(result).to.be.typeOrConstructorOf('Dir');
   });
 
-  it('x()', () => {
-    // test 
+  it('Dir(', () => {
+    var result = new TestModule.Dir();
+    expect(result).to.be.typeOrConstructorOf('Dir');
   });
 
-  it('y()', () => {
-    // test 
+  it('x', () => {
+    var result = subject.x;
+    expect(result).to.be.typeOrConstructorOf('Number');
   });
 
-  it('z()', () => {
-    // test 
+  it('y', () => {
+    var result = subject.y;
+    expect(result).to.be.typeOrConstructorOf('Number');
   });
 
-  it('setX(double)', () => {
-    // test 
+  it('z', () => {
+    var result = subject.z;
+    expect(result).to.be.typeOrConstructorOf('Number');
   });
 
-  it('setY(double)', () => {
-    // test 
+  it('setX(Number', () => {
+    var result = subject.setX(27);
+
   });
 
-  it('setZ(double)', () => {
-    // test 
+  it('setY(Number', () => {
+    var result = subject.setY(28);
+
   });
 
+  it('setZ(Number', () => {
+    var result = subject.setZ(29);
+
+  });
 });

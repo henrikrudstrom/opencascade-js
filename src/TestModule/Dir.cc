@@ -9,8 +9,14 @@ TestModule::Dir::Dir(gp_Dir wrapObj) : wrappedObject(wrapObj) {}
 
 v8::Local<v8::Object> TestModule::Dir::BuildWrapper(void* res) {
     auto obj = new Dir(*static_cast<gp_Dir*>(res));
-    v8::Local<v8::Object> val =
-        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext()).ToLocalChecked();
+    v8::TryCatch onError;
+    v8::MaybeLocal<v8::Object> maybeVal =
+        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext());
+    if (onError.HasCaught()) {
+        v8::Local<v8::Object> empty;
+        return empty;
+    }
+    v8::Local<v8::Object> val = maybeVal.ToLocalChecked();
     obj->Wrap(val);
     return val;
 }
@@ -44,16 +50,16 @@ bool TestModule::Dir::DirOverload3(const Nan::FunctionCallbackInfo<v8::Value>& i
         return false;
     }
 
-    Standard_Real argXv;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argXv)) {
+    Standard_Integer argXv;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argXv)) {
         return false;
     }
-    Standard_Real argYv;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argYv)) {
+    Standard_Integer argYv;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argYv)) {
         return false;
     }
-    Standard_Real argZv;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[2], argZv)) {
+    Standard_Integer argZv;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[2], argZv)) {
         return false;
     }
 
@@ -134,8 +140,8 @@ NAN_GETTER(TestModule::Dir::Z) {
 }
 bool TestModule::Dir::SetXOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argX;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argX)) {
+    Standard_Integer argX;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argX)) {
         return false;
     }
 
@@ -154,8 +160,8 @@ NAN_SETTER(TestModule::Dir::SetX) {
 }
 bool TestModule::Dir::SetYOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argY;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argY)) {
+    Standard_Integer argY;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argY)) {
         return false;
     }
 
@@ -174,8 +180,8 @@ NAN_SETTER(TestModule::Dir::SetY) {
 }
 bool TestModule::Dir::SetZOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argZ;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argZ)) {
+    Standard_Integer argZ;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argZ)) {
         return false;
     }
 

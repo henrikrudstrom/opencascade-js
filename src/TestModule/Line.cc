@@ -9,8 +9,14 @@ TestModule::Line::Line(opencascade::handle<Geom_Line> wrapObj) : Curve(wrapObj) 
 
 v8::Local<v8::Object> TestModule::Line::BuildWrapper(void* res) {
     auto obj = new Line(*static_cast<opencascade::handle<Geom_Line>*>(res));
-    v8::Local<v8::Object> val =
-        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext()).ToLocalChecked();
+    v8::TryCatch onError;
+    v8::MaybeLocal<v8::Object> maybeVal =
+        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext());
+    if (onError.HasCaught()) {
+        v8::Local<v8::Object> empty;
+        return empty;
+    }
+    v8::Local<v8::Object> val = maybeVal.ToLocalChecked();
     obj->Wrap(val);
     return val;
 }

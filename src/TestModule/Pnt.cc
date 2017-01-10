@@ -9,8 +9,14 @@ TestModule::Pnt::Pnt(gp_Pnt wrapObj) : wrappedObject(wrapObj) {}
 
 v8::Local<v8::Object> TestModule::Pnt::BuildWrapper(void* res) {
     auto obj = new Pnt(*static_cast<gp_Pnt*>(res));
-    v8::Local<v8::Object> val =
-        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext()).ToLocalChecked();
+    v8::TryCatch onError;
+    v8::MaybeLocal<v8::Object> maybeVal =
+        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext());
+    if (onError.HasCaught()) {
+        v8::Local<v8::Object> empty;
+        return empty;
+    }
+    v8::Local<v8::Object> val = maybeVal.ToLocalChecked();
     obj->Wrap(val);
     return val;
 }
@@ -30,16 +36,16 @@ bool TestModule::Pnt::PntOverload2(const Nan::FunctionCallbackInfo<v8::Value>& i
         return false;
     }
 
-    Standard_Real argXp;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argXp)) {
+    Standard_Integer argXp;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argXp)) {
         return false;
     }
-    Standard_Real argYp;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argYp)) {
+    Standard_Integer argYp;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argYp)) {
         return false;
     }
-    Standard_Real argZp;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[2], argZp)) {
+    Standard_Integer argZp;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[2], argZp)) {
         return false;
     }
 
@@ -120,16 +126,16 @@ bool TestModule::Pnt::BaryCenterOverload0(const Nan::FunctionCallbackInfo<v8::Va
         return false;
     }
 
-    Standard_Real argAlpha;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argAlpha)) {
+    Standard_Integer argAlpha;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argAlpha)) {
         return false;
     }
     gp_Pnt argP;
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[1], argP)) {
         return false;
     }
-    Standard_Real argBeta;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[2], argBeta)) {
+    Standard_Integer argBeta;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[2], argBeta)) {
         return false;
     }
 
@@ -178,8 +184,8 @@ bool TestModule::Pnt::IsEqualOverload0(const Nan::FunctionCallbackInfo<v8::Value
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argOther)) {
         return false;
     }
-    Standard_Real argLinearTolerance;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argLinearTolerance)) {
+    Standard_Integer argLinearTolerance;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argLinearTolerance)) {
         return false;
     }
 
@@ -289,8 +295,8 @@ bool TestModule::Pnt::RotateOverload0(const Nan::FunctionCallbackInfo<v8::Value>
     if (!Util::ConvertWrappedValue<gp_Ax1>(info[0], argA1)) {
         return false;
     }
-    Standard_Real argAng;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argAng)) {
+    Standard_Integer argAng;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argAng)) {
         return false;
     }
 
@@ -316,8 +322,8 @@ bool TestModule::Pnt::RotatedOverload0(const Nan::FunctionCallbackInfo<v8::Value
     if (!Util::ConvertWrappedValue<gp_Ax1>(info[0], argA1)) {
         return false;
     }
-    Standard_Real argAng;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argAng)) {
+    Standard_Integer argAng;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argAng)) {
         return false;
     }
 
@@ -343,8 +349,8 @@ bool TestModule::Pnt::ScaleOverload0(const Nan::FunctionCallbackInfo<v8::Value>&
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argP)) {
         return false;
     }
-    Standard_Real argS;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argS)) {
+    Standard_Integer argS;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argS)) {
         return false;
     }
 
@@ -370,8 +376,8 @@ bool TestModule::Pnt::ScaledOverload0(const Nan::FunctionCallbackInfo<v8::Value>
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argP)) {
         return false;
     }
-    Standard_Real argS;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argS)) {
+    Standard_Integer argS;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argS)) {
         return false;
     }
 
@@ -397,8 +403,8 @@ bool TestModule::Pnt::SetCoordOverload0(const Nan::FunctionCallbackInfo<v8::Valu
     if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argIndex)) {
         return false;
     }
-    Standard_Real argXi;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argXi)) {
+    Standard_Integer argXi;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argXi)) {
         return false;
     }
 
@@ -413,16 +419,16 @@ bool TestModule::Pnt::SetCoordOverload1(const Nan::FunctionCallbackInfo<v8::Valu
         return false;
     }
 
-    Standard_Real argXp;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argXp)) {
+    Standard_Integer argXp;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argXp)) {
         return false;
     }
-    Standard_Real argYp;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argYp)) {
+    Standard_Integer argYp;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argYp)) {
         return false;
     }
-    Standard_Real argZp;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[2], argZp)) {
+    Standard_Integer argZp;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[2], argZp)) {
         return false;
     }
 
@@ -559,8 +565,8 @@ NAN_METHOD(TestModule::Pnt::Translated) {
 }
 bool TestModule::Pnt::SetXOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argX;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argX)) {
+    Standard_Integer argX;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argX)) {
         return false;
     }
 
@@ -579,8 +585,8 @@ NAN_SETTER(TestModule::Pnt::SetX) {
 }
 bool TestModule::Pnt::SetYOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argY;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argY)) {
+    Standard_Integer argY;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argY)) {
         return false;
     }
 
@@ -599,8 +605,8 @@ NAN_SETTER(TestModule::Pnt::SetY) {
 }
 bool TestModule::Pnt::SetZOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argZ;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argZ)) {
+    Standard_Integer argZ;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argZ)) {
         return false;
     }
 

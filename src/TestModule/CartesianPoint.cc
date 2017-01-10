@@ -10,8 +10,14 @@ TestModule::CartesianPoint::CartesianPoint(opencascade::handle<Geom_CartesianPoi
 
 v8::Local<v8::Object> TestModule::CartesianPoint::BuildWrapper(void* res) {
     auto obj = new CartesianPoint(*static_cast<opencascade::handle<Geom_CartesianPoint>*>(res));
-    v8::Local<v8::Object> val =
-        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext()).ToLocalChecked();
+    v8::TryCatch onError;
+    v8::MaybeLocal<v8::Object> maybeVal =
+        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext());
+    if (onError.HasCaught()) {
+        v8::Local<v8::Object> empty;
+        return empty;
+    }
+    v8::Local<v8::Object> val = maybeVal.ToLocalChecked();
     obj->Wrap(val);
     return val;
 }
@@ -36,16 +42,16 @@ bool TestModule::CartesianPoint::CartesianPointOverload1(const Nan::FunctionCall
         return false;
     }
 
-    Standard_Real argX;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argX)) {
+    Standard_Integer argX;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argX)) {
         return false;
     }
-    Standard_Real argY;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argY)) {
+    Standard_Integer argY;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argY)) {
         return false;
     }
-    Standard_Real argZ;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info[2], argZ)) {
+    Standard_Integer argZ;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info[2], argZ)) {
         return false;
     }
 
@@ -123,8 +129,8 @@ NAN_GETTER(TestModule::CartesianPoint::Z) {
 }
 bool TestModule::CartesianPoint::SetXOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argX;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argX)) {
+    Standard_Integer argX;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argX)) {
         return false;
     }
 
@@ -143,8 +149,8 @@ NAN_SETTER(TestModule::CartesianPoint::SetX) {
 }
 bool TestModule::CartesianPoint::SetYOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argY;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argY)) {
+    Standard_Integer argY;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argY)) {
         return false;
     }
 
@@ -163,8 +169,8 @@ NAN_SETTER(TestModule::CartesianPoint::SetY) {
 }
 bool TestModule::CartesianPoint::SetZOverload0(const Nan::PropertyCallbackInfo<void>& info) {
 
-    Standard_Real argZ;
-    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argZ)) {
+    Standard_Integer argZ;
+    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argZ)) {
         return false;
     }
 

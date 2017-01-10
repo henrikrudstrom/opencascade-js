@@ -1,36 +1,49 @@
-const TestModule = require('../../lib/TestModule/CartesianPoint.js');
+var lib = require('../lib');
+const TestModule = require('../../lib/TestModule.js');
 
 describe('CartesianPoint', () => {
-  it('CartesianPoint(Pnt)', () => {
-    // test 
+  var subject;
+  beforeEach(() => {
+    subject = new TestModule.CartesianPoint(155, 156, 157)
   });
 
-  it('CartesianPoint(double, double, double)', () => {
-    // test 
+  it('CartesianPoint(Number, Number, Number', () => {
+    var result = new TestModule.CartesianPoint(158, 159, 160);
+    expect(result).to.be.typeOrConstructorOf('CartesianPoint');
   });
 
-  it('x()', () => {
-    // test 
+  it('CartesianPoint(Pnt', () => {
+    var result = new TestModule.CartesianPoint(new TestModule.Pnt(161, 162, 163));
+    expect(result).to.be.typeOrConstructorOf('CartesianPoint');
   });
 
-  it('y()', () => {
-    // test 
+  it('x', () => {
+    var result = subject.x;
+    expect(result).to.be.typeOrConstructorOf('Number');
   });
 
-  it('z()', () => {
-    // test 
+  it('y', () => {
+    var result = subject.y;
+    expect(result).to.be.typeOrConstructorOf('Number');
   });
 
-  it('setX(double)', () => {
-    // test 
+  it('z', () => {
+    var result = subject.z;
+    expect(result).to.be.typeOrConstructorOf('Number');
   });
 
-  it('setY(double)', () => {
-    // test 
+  it('setX(Number', () => {
+    var result = subject.setX(164);
+
   });
 
-  it('setZ(double)', () => {
-    // test 
+  it('setY(Number', () => {
+    var result = subject.setY(165);
+
   });
 
+  it('setZ(Number', () => {
+    var result = subject.setZ(166);
+
+  });
 });

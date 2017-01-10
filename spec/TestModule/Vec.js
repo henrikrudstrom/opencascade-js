@@ -1,44 +1,59 @@
-const TestModule = require('../../lib/TestModule/Vec.js');
+var lib = require('../lib');
+const TestModule = require('../../lib/TestModule.js');
 
 describe('Vec', () => {
-  it('Vec()', () => {
-    // test 
+  var subject;
+  beforeEach(() => {
+    subject = new TestModule.Vec(126, 127, 128)
   });
 
-  it('Vec(Dir)', () => {
-    // test 
+  it('Vec(Number, Number, Number', () => {
+    var result = new TestModule.Vec(129, 130, 131);
+    expect(result).to.be.typeOrConstructorOf('Vec');
   });
 
-  it('Vec(double, double, double)', () => {
-    // test 
+  it('Vec(Pnt, Pnt', () => {
+    var result = new TestModule.Vec(new TestModule.Pnt(132, 133, 134), new TestModule.Pnt(135, 136, 137));
+    expect(result).to.be.typeOrConstructorOf('Vec');
   });
 
-  it('Vec(Pnt, Pnt)', () => {
-    // test 
+  it('Vec(Dir', () => {
+    var result = new TestModule.Vec(new TestModule.Dir(138, 139, 140));
+    expect(result).to.be.typeOrConstructorOf('Vec');
   });
 
-  it('x()', () => {
-    // test 
+  it('Vec(', () => {
+    var result = new TestModule.Vec();
+    expect(result).to.be.typeOrConstructorOf('Vec');
   });
 
-  it('y()', () => {
-    // test 
+  it('x', () => {
+    var result = subject.x;
+    expect(result).to.be.typeOrConstructorOf('Number');
   });
 
-  it('z()', () => {
-    // test 
+  it('y', () => {
+    var result = subject.y;
+    expect(result).to.be.typeOrConstructorOf('Number');
   });
 
-  it('setX(double)', () => {
-    // test 
+  it('z', () => {
+    var result = subject.z;
+    expect(result).to.be.typeOrConstructorOf('Number');
   });
 
-  it('setY(double)', () => {
-    // test 
+  it('setX(Number', () => {
+    var result = subject.setX(141);
+
   });
 
-  it('setZ(double)', () => {
-    // test 
+  it('setY(Number', () => {
+    var result = subject.setY(142);
+
   });
 
+  it('setZ(Number', () => {
+    var result = subject.setZ(143);
+
+  });
 });
