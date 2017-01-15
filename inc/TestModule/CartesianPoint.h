@@ -2,10 +2,10 @@
 #ifndef CARTESIANPOINT_H
 #define CARTESIANPOINT_H
 
-#include <nan.h>
+#include <common/DynamicCastMap.h>
 #include <common/Util.h>
 #include <common/WrapperClassTraits.h>
-#include <common/DynamicCastMap.h>
+#include <nan.h>
 
 #include <Geom_CartesianPoint.hxx>
 
@@ -26,23 +26,24 @@ class CartesianPoint : public TestModule::Point {
 
    protected:
    private:
+    static NAN_METHOD(__cptr__);
     static bool firstCall;
 
-    static bool CartesianPointOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
-    static bool CartesianPointOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static bool NewOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static bool NewOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info);
     static NAN_METHOD(New);
-    static bool XOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info);
-    static NAN_GETTER(X);
-    static bool YOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info);
-    static NAN_GETTER(Y);
-    static bool ZOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info);
-    static NAN_GETTER(Z);
-    static bool SetXOverload0(const Nan::PropertyCallbackInfo<void>& info);
-    static NAN_SETTER(SetX);
-    static bool SetYOverload0(const Nan::PropertyCallbackInfo<void>& info);
-    static NAN_SETTER(SetY);
-    static bool SetZOverload0(const Nan::PropertyCallbackInfo<void>& info);
-    static NAN_SETTER(SetZ);
+    static bool xOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info);
+    static NAN_GETTER(x);
+    static bool yOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info);
+    static NAN_GETTER(y);
+    static bool zOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info);
+    static NAN_GETTER(z);
+    static bool setXOverload0(const Nan::PropertyCallbackInfo<void>& info);
+    static NAN_SETTER(setX);
+    static bool setYOverload0(const Nan::PropertyCallbackInfo<void>& info);
+    static NAN_SETTER(setY);
+    static bool setZOverload0(const Nan::PropertyCallbackInfo<void>& info);
+    static NAN_SETTER(setZ);
 };
 }
 
@@ -53,6 +54,7 @@ struct wrapper_for_type<Geom_CartesianPoint> {
 template <>
 struct wrapped_type<TestModule::CartesianPoint> {
     typedef Geom_CartesianPoint type;
+    constexpr static const char* name = "CartesianPoint";
 };
 
 #endif  // CARTESIANPOINT_H

@@ -1,10 +1,10 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <nan.h>
-#include <iostream>
-#include <Standard_Transient.hxx>
 #include <common/WrapperClassTraits.h>
+#include <nan.h>
+#include <Standard_Transient.hxx>
+#include <iostream>
 
 using namespace std;
 
@@ -15,6 +15,7 @@ T* CheckedUnWrap(v8::Handle<v8::Value> value) {
         return NULL;
     }
 
+    Nan::HandleScope scope;
     auto maybeHandle = Nan::To<v8::Object>(value);
     if (maybeHandle.IsEmpty()) {
         return NULL;

@@ -2,16 +2,16 @@
 #ifndef CURVE_H
 #define CURVE_H
 
-#include <nan.h>
+#include <common/DynamicCastMap.h>
 #include <common/Util.h>
 #include <common/WrapperClassTraits.h>
-#include <common/DynamicCastMap.h>
+#include <nan.h>
 
 #include <Geom_Curve.hxx>
 
+#include <TestModule/Geometry.h>
 #include <TestModule/Pnt.h>
 #include <TestModule/Vec.h>
-#include <TestModule/Geometry.h>
 
 namespace TestModule {
 class Curve : public TestModule::Geometry {
@@ -27,13 +27,14 @@ class Curve : public TestModule::Geometry {
 
    protected:
    private:
+    static NAN_METHOD(__cptr__);
     static bool firstCall;
 
     static NAN_METHOD(New);
-    static bool D0Overload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
-    static NAN_METHOD(D0);
-    static bool D1Overload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
-    static NAN_METHOD(D1);
+    static bool d0Overload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static NAN_METHOD(d0);
+    static bool d1Overload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static NAN_METHOD(d1);
 };
 }
 
@@ -44,6 +45,7 @@ struct wrapper_for_type<Geom_Curve> {
 template <>
 struct wrapped_type<TestModule::Curve> {
     typedef Geom_Curve type;
+    constexpr static const char* name = "Curve";
 };
 
 #endif  // CURVE_H

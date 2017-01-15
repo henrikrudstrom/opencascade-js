@@ -2,10 +2,10 @@
 #ifndef POINT_H
 #define POINT_H
 
-#include <nan.h>
+#include <common/DynamicCastMap.h>
 #include <common/Util.h>
 #include <common/WrapperClassTraits.h>
-#include <common/DynamicCastMap.h>
+#include <nan.h>
 
 #include <Geom_Point.hxx>
 
@@ -25,11 +25,12 @@ class Point : public TestModule::Geometry {
 
    protected:
    private:
+    static NAN_METHOD(__cptr__);
     static bool firstCall;
 
     static NAN_METHOD(New);
-    static bool DistanceOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
-    static NAN_METHOD(Distance);
+    static bool distanceOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static NAN_METHOD(distance);
 };
 }
 
@@ -40,6 +41,7 @@ struct wrapper_for_type<Geom_Point> {
 template <>
 struct wrapped_type<TestModule::Point> {
     typedef Geom_Point type;
+    constexpr static const char* name = "Point";
 };
 
 #endif  // POINT_H

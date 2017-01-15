@@ -2,17 +2,18 @@
 #ifndef LINE_H
 #define LINE_H
 
-#include <nan.h>
+#include <common/DynamicCastMap.h>
 #include <common/Util.h>
 #include <common/WrapperClassTraits.h>
-#include <common/DynamicCastMap.h>
+#include <nan.h>
 
 #include <Geom_Line.hxx>
 
 #include <TestModule/Ax1.h>
-#include <TestModule/Pnt.h>
-#include <TestModule/Dir.h>
 #include <TestModule/Curve.h>
+#include <TestModule/Dir.h>
+#include <TestModule/Pnt.h>
+#include <GC_MakeLine.hxx>
 
 namespace TestModule {
 class Line : public TestModule::Curve {
@@ -28,13 +29,20 @@ class Line : public TestModule::Curve {
 
    protected:
    private:
+    static NAN_METHOD(__cptr__);
+    static bool makeLineOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static bool makeLineOverload2(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static bool makeLineOverload4(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static NAN_METHOD(makeLine);
     static bool firstCall;
 
-    static bool LineOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
-    static bool LineOverload2(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static bool NewOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static bool NewOverload2(const Nan::FunctionCallbackInfo<v8::Value>& info);
     static NAN_METHOD(New);
-    static bool SetPositionOverload0(const Nan::PropertyCallbackInfo<void>& info);
-    static NAN_SETTER(SetPosition);
+    static bool positionOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info);
+    static NAN_GETTER(position);
+    static bool setPositionOverload0(const Nan::PropertyCallbackInfo<void>& info);
+    static NAN_SETTER(setPosition);
 };
 }
 
@@ -45,6 +53,7 @@ struct wrapper_for_type<Geom_Line> {
 template <>
 struct wrapped_type<TestModule::Line> {
     typedef Geom_Line type;
+    constexpr static const char* name = "Line";
 };
 
 #endif  // LINE_H

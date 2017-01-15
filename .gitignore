@@ -1,2 +1,7 @@
 build/
 tmp/
+node_modules
+
+*.gcov
+*.o
+*.lcov

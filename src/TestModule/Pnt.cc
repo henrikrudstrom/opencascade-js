@@ -8,49 +8,71 @@ TestModule::Pnt::Pnt(gp_Pnt* wrapObj) : wrappedObject(*wrapObj) {}
 TestModule::Pnt::Pnt(gp_Pnt wrapObj) : wrappedObject(wrapObj) {}
 
 v8::Local<v8::Object> TestModule::Pnt::BuildWrapper(void* res) {
-    auto obj = new Pnt(*static_cast<gp_Pnt*>(res));
-    v8::TryCatch onError;
-    v8::MaybeLocal<v8::Object> maybeVal =
-        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext());
-    if (onError.HasCaught()) {
-        v8::Local<v8::Object> empty;
-        return empty;
-    }
-    v8::Local<v8::Object> val = maybeVal.ToLocalChecked();
-    obj->Wrap(val);
-    return val;
+    Nan::EscapableHandleScope scope;
+    v8::TryCatch errorHandler;
+
+    v8::Local<v8::Function> func = Nan::GetFunction(Nan::New(constructor)).ToLocalChecked();
+    v8::Local<v8::Value> args[1];
+    args[0] = Nan::New<v8::External>(res);
+    v8::MaybeLocal<v8::Object> maybeVal = Nan::NewInstance(func, 1, args);
+
+    return scope.Escape(maybeVal.ToLocalChecked());
+}
+
+NAN_METHOD(TestModule::Pnt::__cptr__) {
+    auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
+    int addr = reinterpret_cast<std::uintptr_t>(&wrapped->wrappedObject);
+    info.GetReturnValue().Set(Nan::New<v8::Int32>(addr));
 }
 
 bool TestModule::Pnt::firstCall = true;
-bool TestModule::Pnt::PntOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::NewOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 0) {
         return false;
     }
+    Nan::TryCatch errorHandler;
 
-    auto wrapper = new TestModule::Pnt(new gp_Pnt());
-    wrapper->Wrap(info.This());
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+
+    try {
+        auto wrapper = new TestModule::Pnt(new gp_Pnt());
+        wrapper->Wrap(info.This());
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
-bool TestModule::Pnt::PntOverload2(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::NewOverload2(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 3) {
         return false;
     }
+    Nan::TryCatch errorHandler;
+    Standard_Real argXp;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argXp)) {
+        return false;
+    }
+    Standard_Real argYp;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argYp)) {
+        return false;
+    }
+    Standard_Real argZp;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[2], argZp)) {
+        return false;
+    }
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
 
-    Standard_Integer argXp;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argXp)) {
-        return false;
+    try {
+        auto wrapper = new TestModule::Pnt(new gp_Pnt(argXp, argYp, argZp));
+        wrapper->Wrap(info.This());
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
     }
-    Standard_Integer argYp;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argYp)) {
-        return false;
-    }
-    Standard_Integer argZp;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[2], argZp)) {
-        return false;
-    }
-
-    auto wrapper = new TestModule::Pnt(new gp_Pnt(argXp, argYp, argZp));
-    wrapper->Wrap(info.This());
     return true;
 }
 
@@ -68,430 +90,628 @@ NAN_METHOD(TestModule::Pnt::New) {
         firstCall = false;
         return;
     }
-    if (TestModule::Pnt::PntOverload0(info)) {
+    if (info.Length() == 1 && info[0]->IsExternal()) {
+        auto ext = info[0].As<v8::External>()->Value();
+        auto wrapper = new Pnt(*static_cast<gp_Pnt*>(ext));
+        wrapper->Wrap(info.This());
         return;
     }
-    if (TestModule::Pnt::PntOverload2(info)) {
+
+    if (TestModule::Pnt::NewOverload0(info)) {
+        return;
+    }
+    if (TestModule::Pnt::NewOverload2(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::XOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::xOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info) {
+    Nan::TryCatch errorHandler;
 
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.X();
-    info.GetReturnValue().Set(Nan::New(res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.X();
+        info.GetReturnValue().Set(Nan::New(res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_GETTER(TestModule::Pnt::X) {
-    if (TestModule::Pnt::XOverload0(info)) {
+NAN_GETTER(TestModule::Pnt::x) {
+    if (TestModule::Pnt::xOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::YOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::yOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info) {
+    Nan::TryCatch errorHandler;
 
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.Y();
-    info.GetReturnValue().Set(Nan::New(res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.Y();
+        info.GetReturnValue().Set(Nan::New(res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_GETTER(TestModule::Pnt::Y) {
-    if (TestModule::Pnt::YOverload0(info)) {
+NAN_GETTER(TestModule::Pnt::y) {
+    if (TestModule::Pnt::yOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::ZOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::zOverload0(const Nan::PropertyCallbackInfo<v8::Value>& info) {
+    Nan::TryCatch errorHandler;
 
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.Z();
-    info.GetReturnValue().Set(Nan::New(res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.Z();
+        info.GetReturnValue().Set(Nan::New(res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_GETTER(TestModule::Pnt::Z) {
-    if (TestModule::Pnt::ZOverload0(info)) {
+NAN_GETTER(TestModule::Pnt::z) {
+    if (TestModule::Pnt::zOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::BaryCenterOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::baryCenterOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 3) {
         return false;
     }
-
-    Standard_Integer argAlpha;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argAlpha)) {
+    Nan::TryCatch errorHandler;
+    Standard_Real argAlpha;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argAlpha)) {
         return false;
     }
     gp_Pnt argP;
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[1], argP)) {
         return false;
     }
-    Standard_Integer argBeta;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[2], argBeta)) {
+    Standard_Real argBeta;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[2], argBeta)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    obj.BaryCenter(argAlpha, argP, argBeta);
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj.BaryCenter(argAlpha, argP, argBeta);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
 
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::BaryCenter) {
-    if (TestModule::Pnt::BaryCenterOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::baryCenter) {
+    if (TestModule::Pnt::baryCenterOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::DistanceOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::distanceOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 1) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Pnt argOther;
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argOther)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.Distance(argOther);
-    info.GetReturnValue().Set(Nan::New(res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.Distance(argOther);
+        info.GetReturnValue().Set(Nan::New(res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::Distance) {
-    if (TestModule::Pnt::DistanceOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::distance) {
+    if (TestModule::Pnt::distanceOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::IsEqualOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::isEqualOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 2) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Pnt argOther;
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argOther)) {
         return false;
     }
-    Standard_Integer argLinearTolerance;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argLinearTolerance)) {
+    Standard_Real argLinearTolerance;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argLinearTolerance)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.IsEqual(argOther, argLinearTolerance);
-    info.GetReturnValue().Set(Nan::New(res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.IsEqual(argOther, argLinearTolerance);
+        info.GetReturnValue().Set(Nan::New(res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::IsEqual) {
-    if (TestModule::Pnt::IsEqualOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::isEqual) {
+    if (TestModule::Pnt::isEqualOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::MirrorOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::mirrorOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 1) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Pnt argP;
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argP)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    obj.Mirror(argP);
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj.Mirror(argP);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
 
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
-bool TestModule::Pnt::MirrorOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::mirrorOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 1) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Ax1 argA1;
     if (!Util::ConvertWrappedValue<gp_Ax1>(info[0], argA1)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    obj.Mirror(argA1);
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj.Mirror(argA1);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
 
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
+    return true;
+}
+bool TestModule::Pnt::mirrorOverload2(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    if (info.Length() != 1) {
+        return false;
+    }
+    Nan::TryCatch errorHandler;
+    gp_Ax2 argA2;
+    if (!Util::ConvertWrappedValue<gp_Ax2>(info[0], argA2)) {
+        return false;
+    }
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
+    auto obj = wrapped->wrappedObject;
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj.Mirror(argA2);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
+
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::Mirror) {
-    if (TestModule::Pnt::MirrorOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::mirror) {
+    if (TestModule::Pnt::mirrorOverload0(info)) {
         return;
     }
-    if (TestModule::Pnt::MirrorOverload1(info)) {
+    if (TestModule::Pnt::mirrorOverload1(info)) {
+        return;
+    }
+    if (TestModule::Pnt::mirrorOverload2(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::MirroredOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::mirroredOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 1) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Pnt argP;
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argP)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.Mirrored(argP);
-    info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.Mirrored(argP);
+        info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
-bool TestModule::Pnt::MirroredOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::mirroredOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 1) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Ax1 argA1;
     if (!Util::ConvertWrappedValue<gp_Ax1>(info[0], argA1)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.Mirrored(argA1);
-    info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.Mirrored(argA1);
+        info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
+    return true;
+}
+bool TestModule::Pnt::mirroredOverload2(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    if (info.Length() != 1) {
+        return false;
+    }
+    Nan::TryCatch errorHandler;
+    gp_Ax2 argA2;
+    if (!Util::ConvertWrappedValue<gp_Ax2>(info[0], argA2)) {
+        return false;
+    }
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
+    auto obj = wrapped->wrappedObject;
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.Mirrored(argA2);
+        info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::Mirrored) {
-    if (TestModule::Pnt::MirroredOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::mirrored) {
+    if (TestModule::Pnt::mirroredOverload0(info)) {
         return;
     }
-    if (TestModule::Pnt::MirroredOverload1(info)) {
+    if (TestModule::Pnt::mirroredOverload1(info)) {
+        return;
+    }
+    if (TestModule::Pnt::mirroredOverload2(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::RotateOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::rotateOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 2) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Ax1 argA1;
     if (!Util::ConvertWrappedValue<gp_Ax1>(info[0], argA1)) {
         return false;
     }
-    Standard_Integer argAng;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argAng)) {
+    Standard_Real argAng;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argAng)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    obj.Rotate(argA1, argAng);
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj.Rotate(argA1, argAng);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
 
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::Rotate) {
-    if (TestModule::Pnt::RotateOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::rotate) {
+    if (TestModule::Pnt::rotateOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::RotatedOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::rotatedOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 2) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Ax1 argA1;
     if (!Util::ConvertWrappedValue<gp_Ax1>(info[0], argA1)) {
         return false;
     }
-    Standard_Integer argAng;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argAng)) {
+    Standard_Real argAng;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argAng)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.Rotated(argA1, argAng);
-    info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.Rotated(argA1, argAng);
+        info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::Rotated) {
-    if (TestModule::Pnt::RotatedOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::rotated) {
+    if (TestModule::Pnt::rotatedOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::ScaleOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::scaleOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 2) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Pnt argP;
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argP)) {
         return false;
     }
-    Standard_Integer argS;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argS)) {
+    Standard_Real argS;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argS)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    obj.Scale(argP, argS);
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj.Scale(argP, argS);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
 
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::Scale) {
-    if (TestModule::Pnt::ScaleOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::scale) {
+    if (TestModule::Pnt::scaleOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::ScaledOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::scaledOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 2) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Pnt argP;
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argP)) {
         return false;
     }
-    Standard_Integer argS;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argS)) {
+    Standard_Real argS;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[1], argS)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.Scaled(argP, argS);
-    info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.Scaled(argP, argS);
+        info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::Scaled) {
-    if (TestModule::Pnt::ScaledOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::scaled) {
+    if (TestModule::Pnt::scaledOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::SetCoordOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-    if (info.Length() != 2) {
-        return false;
-    }
-
-    Standard_Integer argIndex;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argIndex)) {
-        return false;
-    }
-    Standard_Integer argXi;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argXi)) {
-        return false;
-    }
-
-    auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
-    auto obj = wrapped->wrappedObject;
-    obj.SetCoord(argIndex, argXi);
-
-    return true;
-}
-bool TestModule::Pnt::SetCoordOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-    if (info.Length() != 3) {
-        return false;
-    }
-
-    Standard_Integer argXp;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argXp)) {
-        return false;
-    }
-    Standard_Integer argYp;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[1], argYp)) {
-        return false;
-    }
-    Standard_Integer argZp;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[2], argZp)) {
-        return false;
-    }
-
-    auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
-    auto obj = wrapped->wrappedObject;
-    obj.SetCoord(argXp, argYp, argZp);
-
-    return true;
-}
-
-NAN_METHOD(TestModule::Pnt::SetCoord) {
-    if (TestModule::Pnt::SetCoordOverload0(info)) {
-        return;
-    }
-    if (TestModule::Pnt::SetCoordOverload1(info)) {
-        return;
-    }
-    Nan::ThrowError("Argument exception.");
-}
-bool TestModule::Pnt::SquareDistanceOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::squareDistanceOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 1) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Pnt argOther;
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argOther)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.SquareDistance(argOther);
-    info.GetReturnValue().Set(Nan::New(res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.SquareDistance(argOther);
+        info.GetReturnValue().Set(Nan::New(res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::SquareDistance) {
-    if (TestModule::Pnt::SquareDistanceOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::squareDistance) {
+    if (TestModule::Pnt::squareDistanceOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::TranslateOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::translateOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 1) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Vec argV;
     if (!Util::ConvertWrappedValue<gp_Vec>(info[0], argV)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    obj.Translate(argV);
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj.Translate(argV);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
 
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
-bool TestModule::Pnt::TranslateOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::translateOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 2) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Pnt argP1;
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argP1)) {
         return false;
@@ -500,44 +720,67 @@ bool TestModule::Pnt::TranslateOverload1(const Nan::FunctionCallbackInfo<v8::Val
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[1], argP2)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    obj.Translate(argP1, argP2);
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj.Translate(argP1, argP2);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
 
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::Translate) {
-    if (TestModule::Pnt::TranslateOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::translate) {
+    if (TestModule::Pnt::translateOverload0(info)) {
         return;
     }
-    if (TestModule::Pnt::TranslateOverload1(info)) {
+    if (TestModule::Pnt::translateOverload1(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::TranslatedOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::translatedOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 1) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Vec argV;
     if (!Util::ConvertWrappedValue<gp_Vec>(info[0], argV)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.Translated(argV);
-    info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.Translated(argV);
+        info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
-bool TestModule::Pnt::TranslatedOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+bool TestModule::Pnt::translatedOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.Length() != 2) {
         return false;
     }
-
+    Nan::TryCatch errorHandler;
     gp_Pnt argP1;
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[0], argP1)) {
         return false;
@@ -546,79 +789,128 @@ bool TestModule::Pnt::TranslatedOverload1(const Nan::FunctionCallbackInfo<v8::Va
     if (!Util::ConvertWrappedValue<gp_Pnt>(info[1], argP2)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    auto res = obj.Translated(argP1, argP2);
-    info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        auto res = obj.Translated(argP1, argP2);
+        info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void*)&res));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Pnt::Translated) {
-    if (TestModule::Pnt::TranslatedOverload0(info)) {
+NAN_METHOD(TestModule::Pnt::translated) {
+    if (TestModule::Pnt::translatedOverload0(info)) {
         return;
     }
-    if (TestModule::Pnt::TranslatedOverload1(info)) {
+    if (TestModule::Pnt::translatedOverload1(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::SetXOverload0(const Nan::PropertyCallbackInfo<void>& info) {
-
-    Standard_Integer argX;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argX)) {
+bool TestModule::Pnt::setXOverload0(const Nan::PropertyCallbackInfo<void>& info) {
+    Nan::TryCatch errorHandler;
+    Standard_Real argX;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argX)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    obj.SetX(argX);
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj.SetX(argX);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
 
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_SETTER(TestModule::Pnt::SetX) {
-    if (TestModule::Pnt::SetXOverload0(info)) {
+NAN_SETTER(TestModule::Pnt::setX) {
+    if (TestModule::Pnt::setXOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::SetYOverload0(const Nan::PropertyCallbackInfo<void>& info) {
-
-    Standard_Integer argY;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argY)) {
+bool TestModule::Pnt::setYOverload0(const Nan::PropertyCallbackInfo<void>& info) {
+    Nan::TryCatch errorHandler;
+    Standard_Real argY;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argY)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    obj.SetY(argY);
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj.SetY(argY);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
 
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_SETTER(TestModule::Pnt::SetY) {
-    if (TestModule::Pnt::SetYOverload0(info)) {
+NAN_SETTER(TestModule::Pnt::setY) {
+    if (TestModule::Pnt::setYOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Pnt::SetZOverload0(const Nan::PropertyCallbackInfo<void>& info) {
-
-    Standard_Integer argZ;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info.Data(), argZ)) {
+bool TestModule::Pnt::setZOverload0(const Nan::PropertyCallbackInfo<void>& info) {
+    Nan::TryCatch errorHandler;
+    Standard_Real argZ;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info.Data(), argZ)) {
         return false;
     }
-
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Pnt>(info.Holder());
     auto obj = wrapped->wrappedObject;
-    obj.SetZ(argZ);
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj.SetZ(argZ);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
 
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_SETTER(TestModule::Pnt::SetZ) {
-    if (TestModule::Pnt::SetZOverload0(info)) {
+NAN_SETTER(TestModule::Pnt::setZ) {
+    if (TestModule::Pnt::setZOverload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
@@ -632,22 +924,22 @@ NAN_MODULE_INIT(TestModule::Pnt::Init) {
     ctor->SetClassName(qualifiedName);
     ctorInst->SetInternalFieldCount(1);  // for ObjectWrap, it should set 1
 
-    Nan::SetAccessor(ctorInst, Nan::New("x").ToLocalChecked(), X, SetX);
-    Nan::SetAccessor(ctorInst, Nan::New("y").ToLocalChecked(), Y, SetY);
-    Nan::SetAccessor(ctorInst, Nan::New("z").ToLocalChecked(), Z, SetZ);
-    Nan::SetPrototypeMethod(ctor, "baryCenter", BaryCenter);
-    Nan::SetPrototypeMethod(ctor, "distance", Distance);
-    Nan::SetPrototypeMethod(ctor, "isEqual", IsEqual);
-    Nan::SetPrototypeMethod(ctor, "mirror", Mirror);
-    Nan::SetPrototypeMethod(ctor, "mirrored", Mirrored);
-    Nan::SetPrototypeMethod(ctor, "rotate", Rotate);
-    Nan::SetPrototypeMethod(ctor, "rotated", Rotated);
-    Nan::SetPrototypeMethod(ctor, "scale", Scale);
-    Nan::SetPrototypeMethod(ctor, "scaled", Scaled);
-    Nan::SetPrototypeMethod(ctor, "setCoord", SetCoord);
-    Nan::SetPrototypeMethod(ctor, "squareDistance", SquareDistance);
-    Nan::SetPrototypeMethod(ctor, "translate", Translate);
-    Nan::SetPrototypeMethod(ctor, "translated", Translated);
+    Nan::SetPrototypeMethod(ctor, "__cptr__", __cptr__);
+    Nan::SetAccessor(ctorInst, Nan::New("x").ToLocalChecked(), x, setX);
+    Nan::SetAccessor(ctorInst, Nan::New("y").ToLocalChecked(), y, setY);
+    Nan::SetAccessor(ctorInst, Nan::New("z").ToLocalChecked(), z, setZ);
+    Nan::SetPrototypeMethod(ctor, "baryCenter", baryCenter);
+    Nan::SetPrototypeMethod(ctor, "distance", distance);
+    Nan::SetPrototypeMethod(ctor, "isEqual", isEqual);
+    Nan::SetPrototypeMethod(ctor, "mirror", mirror);
+    Nan::SetPrototypeMethod(ctor, "mirrored", mirrored);
+    Nan::SetPrototypeMethod(ctor, "rotate", rotate);
+    Nan::SetPrototypeMethod(ctor, "rotated", rotated);
+    Nan::SetPrototypeMethod(ctor, "scale", scale);
+    Nan::SetPrototypeMethod(ctor, "scaled", scaled);
+    Nan::SetPrototypeMethod(ctor, "squareDistance", squareDistance);
+    Nan::SetPrototypeMethod(ctor, "translate", translate);
+    Nan::SetPrototypeMethod(ctor, "translated", translated);
 
     Nan::Set(target, className, Nan::GetFunction(ctor).ToLocalChecked());
     v8::Local<v8::Object> obj =

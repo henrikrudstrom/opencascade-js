@@ -8,73 +8,100 @@ TestModule::Curve::Curve(Geom_Curve *wrapObj) : Geometry(wrapObj) {}
 TestModule::Curve::Curve(opencascade::handle<Geom_Curve> wrapObj) : Geometry(wrapObj) {}
 
 v8::Local<v8::Object> TestModule::Curve::BuildWrapper(void *res) {
-    auto obj = new Curve(*static_cast<opencascade::handle<Geom_Curve> *>(res));
-    v8::TryCatch onError;
-    v8::MaybeLocal<v8::Object> maybeVal =
-        Nan::New(constructor)->GetFunction()->NewInstance(Nan::GetCurrentContext());
-    if (onError.HasCaught()) {
-        v8::Local<v8::Object> empty;
-        return empty;
-    }
-    v8::Local<v8::Object> val = maybeVal.ToLocalChecked();
-    obj->Wrap(val);
-    return val;
+    Nan::EscapableHandleScope scope;
+    v8::TryCatch errorHandler;
+
+    v8::Local<v8::Function> func = Nan::GetFunction(Nan::New(constructor)).ToLocalChecked();
+    v8::Local<v8::Value> args[1];
+    args[0] = Nan::New<v8::External>(res);
+    v8::MaybeLocal<v8::Object> maybeVal = Nan::NewInstance(func, 1, args);
+
+    return scope.Escape(maybeVal.ToLocalChecked());
+}
+
+NAN_METHOD(TestModule::Curve::__cptr__) {
+    auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Curve>(info.Holder());
+    int addr = reinterpret_cast<std::uintptr_t>(&wrapped->wrappedObject);
+    info.GetReturnValue().Set(Nan::New<v8::Int32>(addr));
 }
 
 bool TestModule::Curve::firstCall = true;
 
 NAN_METHOD(TestModule::Curve::New) {}
-bool TestModule::Curve::D0Overload0(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+bool TestModule::Curve::d0Overload0(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     if (info.Length() != 1) {
         return false;
     }
-
-    Standard_Integer argU;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argU)) {
+    Nan::TryCatch errorHandler;
+    Standard_Real argU;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argU)) {
         return false;
     }
     gp_Pnt argP;
 
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Curve>(info.Holder());
     auto obj = opencascade::handle<Geom_Curve>::DownCast(wrapped->wrappedObject);
-    obj->D0(argU, argP);
-    info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void *)&argP));
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj->D0(argU, argP);
+        info.GetReturnValue().Set(TestModule::Pnt::BuildWrapper((void *)&argP));
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Curve::D0) {
-    if (TestModule::Curve::D0Overload0(info)) {
+NAN_METHOD(TestModule::Curve::d0) {
+    if (TestModule::Curve::d0Overload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
 }
-bool TestModule::Curve::D1Overload0(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+bool TestModule::Curve::d1Overload0(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     if (info.Length() != 1) {
         return false;
     }
-
-    Standard_Integer argU;
-    if (!Util::ConvertWrappedValue<Standard_Integer>(info[0], argU)) {
+    Nan::TryCatch errorHandler;
+    Standard_Real argU;
+    if (!Util::ConvertWrappedValue<Standard_Real>(info[0], argU)) {
         return false;
     }
     gp_Pnt argP;
 
     gp_Vec argV1;
 
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
     auto wrapped = Nan::ObjectWrap::Unwrap<TestModule::Curve>(info.Holder());
     auto obj = opencascade::handle<Geom_Curve>::DownCast(wrapped->wrappedObject);
-    obj->D1(argU, argP, argV1);
-    auto returnValue = Nan::New<v8::Object>();
-    returnValue->Set(Nan::GetCurrentContext(), Nan::New("P").ToLocalChecked(),
-                     TestModule::Pnt::BuildWrapper((void *)&argP));
-    returnValue->Set(Nan::GetCurrentContext(), Nan::New("V1").ToLocalChecked(),
-                     TestModule::Vec::BuildWrapper((void *)&argV1));
-    info.GetReturnValue().Set(returnValue);
+    if (errorHandler.HasCaught()) {
+        return false;
+    }
+    try {
+        obj->D1(argU, argP, argV1);
+        Nan::HandleScope scope;
+        auto returnValue = Nan::New<v8::Object>();
+        returnValue->Set(Nan::GetCurrentContext(), Nan::New("P").ToLocalChecked(),
+                         TestModule::Pnt::BuildWrapper((void *)&argP));
+        returnValue->Set(Nan::GetCurrentContext(), Nan::New("V1").ToLocalChecked(),
+                         TestModule::Vec::BuildWrapper((void *)&argV1));
+        info.GetReturnValue().Set(returnValue);
+    } catch (...) {
+        Nan::ThrowError(Nan::New("Error occured in native call.").ToLocalChecked());
+        return true;
+    }
     return true;
 }
 
-NAN_METHOD(TestModule::Curve::D1) {
-    if (TestModule::Curve::D1Overload0(info)) {
+NAN_METHOD(TestModule::Curve::d1) {
+    if (TestModule::Curve::d1Overload0(info)) {
         return;
     }
     Nan::ThrowError("Argument exception.");
@@ -89,8 +116,9 @@ NAN_MODULE_INIT(TestModule::Curve::Init) {
     ctorInst->SetInternalFieldCount(1);  // for ObjectWrap, it should set 1
     ctor->Inherit(Nan::New(TestModule::Geometry::constructor));
 
-    Nan::SetPrototypeMethod(ctor, "d0", D0);
-    Nan::SetPrototypeMethod(ctor, "d1", D1);
+    Nan::SetPrototypeMethod(ctor, "__cptr__", __cptr__);
+    Nan::SetPrototypeMethod(ctor, "d0", d0);
+    Nan::SetPrototypeMethod(ctor, "d1", d1);
 
     Nan::Set(target, className, Nan::GetFunction(ctor).ToLocalChecked());
     v8::Local<v8::Object> obj =

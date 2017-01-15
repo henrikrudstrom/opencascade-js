@@ -2,15 +2,16 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include <nan.h>
+#include <common/DynamicCastMap.h>
 #include <common/Util.h>
 #include <common/WrapperClassTraits.h>
-#include <common/DynamicCastMap.h>
+#include <nan.h>
 
 #include <Geom_Geometry.hxx>
 
-#include <TestModule/Pnt.h>
 #include <TestModule/Ax1.h>
+#include <TestModule/Ax2.h>
+#include <TestModule/Pnt.h>
 
 namespace TestModule {
 class Geometry : public Nan::ObjectWrap {
@@ -26,12 +27,14 @@ class Geometry : public Nan::ObjectWrap {
 
    protected:
    private:
+    static NAN_METHOD(__cptr__);
     static bool firstCall;
 
     static NAN_METHOD(New);
-    static bool MirroredOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
-    static bool MirroredOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info);
-    static NAN_METHOD(Mirrored);
+    static bool mirroredOverload0(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static bool mirroredOverload1(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static bool mirroredOverload2(const Nan::FunctionCallbackInfo<v8::Value>& info);
+    static NAN_METHOD(mirrored);
 };
 }
 
@@ -42,6 +45,7 @@ struct wrapper_for_type<Geom_Geometry> {
 template <>
 struct wrapped_type<TestModule::Geometry> {
     typedef Geom_Geometry type;
+    constexpr static const char* name = "Geometry";
 };
 
 #endif  // GEOMETRY_H
